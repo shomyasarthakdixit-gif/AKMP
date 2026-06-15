@@ -27,6 +27,9 @@ public class CourseController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private com.akmp.backendsql.services.MongoSyncService mongoSyncService;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('MEMBER') or hasRole('USER')")
     public List<Course> getAllCourses() {
@@ -56,7 +59,9 @@ public class CourseController {
         if (course.getAuthor() != null && course.getAuthor().getId() != null) {
             course.setAuthor(resolveAuthor(course.getAuthor().getId()));
         }
-        return courseRepository.save(course);
+        Course saved = courseRepository.save(course);
+        mongoSyncService.syncCourse(saved);
+        return saved;
     }
 
     @PutMapping("/{id}")
@@ -72,7 +77,9 @@ public class CourseController {
             if (courseDetails.getAuthor() != null && courseDetails.getAuthor().getId() != null) {
                 course.setAuthor(resolveAuthor(courseDetails.getAuthor().getId()));
             }
-            return ResponseEntity.ok(courseRepository.save(course));
+            Course updated = courseRepository.save(course);
+            mongoSyncService.syncCourse(updated);
+            return ResponseEntity.ok(updated);
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -81,6 +88,7 @@ public class CourseController {
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
         return courseRepository.findById(id).map(course -> {
             courseRepository.delete(course);
+            mongoSyncService.deleteCourse(id);
             return ResponseEntity.ok().build();
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -10,10 +10,10 @@ import DashboardOverview from '../components/DashboardOverview';
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const navigate = useNavigate();
-  const role = localStorage.getItem('role') || 'ROLE_USER';
+  const role = sessionStorage.getItem('role') || 'ROLE_USER';
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) {
       navigate('/login');
     }
@@ -54,3 +54,4 @@ export default function Dashboard() {
     </DashboardLayout>
   );
 }
+

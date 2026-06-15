@@ -1,14 +1,25 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Eye, EyeOff, CheckCircle2, Sparkles } from 'lucide-react';
+
+const GRAD = 'linear-gradient(135deg, #6366F1 0%, #60A5FA 100%)';
+const INDIGO = '#6366F1';
+
+const perks = [
+  'Access to all course materials',
+  'Collaborate with your team',
+  'Personalised dashboard & reviews',
+  'Role-based, secure access control',
+];
 
 export default function Signup() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('USER');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -16,8 +27,7 @@ export default function Signup() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (sessionStorage.getItem('token')) {
       navigate('/dashboard');
     }
   }, [navigate]);
@@ -27,156 +37,162 @@ export default function Signup() {
     setIsLoading(true);
     setError('');
     try {
-      await axios.post('http://localhost:8000/api/v1/auth/signup', {
-        username,
-        email,
-        password,
-        role
-      });
+      await axios.post('http://localhost:8002/api/v1/auth/signup', { username, email, password, role });
       setSuccess(true);
-      setTimeout(() => navigate('/login'), 2000);
+      setTimeout(() => navigate('/login'), 2500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed.');
+      setError(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex w-full animate-in fade-in duration-700">
-      {/* Left Panel - Branding & Illustration */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-slate-900 p-12 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 via-blue-900 to-slate-800 z-0"></div>
-        
-        {/* Animated decorative blobs */}
-        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary/40 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
-        <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-blue-500/40 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse delay-700"></div>
+    <div className="min-h-screen flex w-full">
+      {/* ── LEFT PANEL ── */}
+      <div className="hidden lg:flex flex-col justify-between w-[52%] relative overflow-hidden p-12 text-white"
+        style={{ background: 'linear-gradient(160deg, #0F172A 0%, #0c1a3a 50%, #1e1b4b 100%)' }}>
+        <div className="absolute top-[-60px] right-[-60px] w-80 h-80 rounded-full opacity-20 animate-float-slow"
+          style={{ background: 'radial-gradient(circle, #06B6D4 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-80px] left-[-60px] w-72 h-72 rounded-full opacity-20 animate-float-medium"
+          style={{ background: 'radial-gradient(circle, #F97316 0%, transparent 70%)' }} />
+        <div className="absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 opacity-20 z-0" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-
-        <div className="relative z-10 flex items-center gap-3 slide-in-from-left-4 duration-500 delay-100 fill-mode-both animate-in fade-in">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white to-blue-100 text-slate-900 flex items-center justify-center font-bold text-2xl shadow-lg">
-            A
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg" style={{ background: GRAD }}>A</div>
+          <div>
+            <span className="text-lg font-bold tracking-tight" style={{ fontFamily: "'Sora', sans-serif" }}>AKMP</span>
+            <p className="text-white/40 text-xs">Knowledge Management Portal</p>
           </div>
-          <span className="text-2xl font-bold tracking-tight">Access Portal</span>
         </div>
 
-        <div className="relative z-10 max-w-lg mb-20 slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both animate-in fade-in">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-            Join the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">knowledge hub.</span>
+        <div className="relative z-10 max-w-lg">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6"
+            style={{ background: 'rgba(6,182,212,0.2)', border: '1px solid rgba(6,182,212,0.4)', color: '#67E8F9' }}>
+            <Sparkles size={12} />
+            Join 500+ learners today
+          </div>
+          <h1 className="text-5xl font-extrabold mb-5 leading-tight" style={{ fontFamily: "'Sora', sans-serif" }}>
+            Join the{' '}
+            <span className="gradient-text">Knowledge Hub</span>
           </h1>
-          <p className="text-slate-200 text-lg leading-relaxed border-l-4 border-emerald-400 pl-4">
-            Create an account to start discovering documents, connecting with team members, and contributing to your organization's success.
+          <p className="text-white/55 text-lg leading-relaxed mb-10">
+            Create your account and start collaborating on shared learning journeys.
           </p>
+          <div className="space-y-3">
+            {perks.map(perk => (
+              <div key={perk} className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: 'rgba(6,182,212,0.25)' }}>
+                  <CheckCircle2 size={12} style={{ color: '#67E8F9' }} />
+                </div>
+                <span className="text-sm text-white/70">{perk}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10 flex items-center justify-between text-sm text-slate-400 animate-in fade-in duration-1000 delay-500 fill-mode-both">
-          <span>© 2026 Access Knowledge Management Portal</span>
+        <div className="relative z-10 flex items-center justify-between text-xs text-white/25">
+          <span>© 2026 AKMP. All rights reserved.</span>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
+            <a href="#" className="hover:text-white/60 transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white/60 transition-colors">Terms</a>
           </div>
         </div>
       </div>
 
-      {/* Right Panel - Signup Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background overflow-y-auto relative">
-        {/* Decorative subtle background circle */}
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+      {/* ── RIGHT PANEL ── */}
+      <div className="flex-1 flex items-center justify-center p-6 md:p-10 bg-[#FAFAFB] dark:bg-background relative overflow-y-auto">
+        <div className="absolute top-0 left-0 w-72 h-72 rounded-full opacity-20 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
 
-        <div className="w-full max-w-md space-y-8 my-auto z-10 slide-in-from-bottom-8 duration-500 delay-100 fill-mode-both animate-in fade-in">
-          <div className="text-center lg:text-left pt-8 lg:pt-0">
-            <div className="flex lg:hidden items-center justify-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-primary-foreground flex items-center justify-center font-bold text-2xl shadow-md">
-                A
-              </div>
-              <span className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">Access Portal</span>
-            </div>
-            
-            <h2 className="text-4xl font-bold tracking-tight">Create an account</h2>
-            <p className="text-muted-foreground mt-3 text-lg">Enter your details to get started</p>
+        <div className="w-full max-w-md z-10 py-8 page-enter">
+          <div className="flex lg:hidden items-center gap-3 mb-8 justify-center">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg text-white" style={{ background: GRAD }}>A</div>
+            <span className="text-xl font-bold" style={{ fontFamily: "'Sora', sans-serif" }}>AKMP</span>
           </div>
-          
+
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-[#0F172A] dark:text-foreground mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
+              Create an account ✨
+            </h2>
+            <p className="text-[#64748B] dark:text-muted-foreground">Enter your details to get started</p>
+          </div>
+
           {error && (
-            <div className="p-4 bg-destructive/10 text-destructive rounded-lg text-sm font-medium border border-destructive/20 animate-in shake">
+            <div className="mb-5 p-4 rounded-xl text-sm font-medium flex items-center gap-2.5 animate-in slide-in-from-top-2 duration-300"
+              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#DC2626' }}
+              role="alert">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               {error}
             </div>
           )}
-
           {success && (
-            <div className="p-4 bg-success/10 text-success rounded-lg text-sm font-medium border border-success/20 animate-in slide-in-from-top-2">
-              Account created successfully! Redirecting to login...
+            <div className="mb-5 p-4 rounded-xl text-sm font-medium flex items-center gap-2.5 animate-in slide-in-from-top-2 duration-300"
+              style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)', color: '#0891B2' }}
+              role="status">
+              <CheckCircle2 size={16} />
+              Account created! Redirecting to sign in…
             </div>
           )}
 
-          <form onSubmit={handleSignup} className="space-y-5 bg-card/50 p-6 md:p-8 rounded-2xl border border-border shadow-sm backdrop-blur-sm">
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm font-semibold">Username</Label>
-              <Input 
-                id="username"
-                type="text" 
-                placeholder="Choose a username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required 
-                className="h-12 bg-background border-input focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
-              />
+          <form onSubmit={handleSignup} className="space-y-4" aria-label="Create account form">
+            <div className="space-y-1.5">
+              <Label htmlFor="username" className="text-sm font-semibold text-[#0F172A] dark:text-foreground">Username</Label>
+              <Input id="username" type="text" placeholder="Choose a username" value={username}
+                onChange={(e) => setUsername(e.target.value)} required autoComplete="username"
+                className="h-12 rounded-xl border-[#E5E7EB] bg-white dark:bg-[#1E293B] text-sm shadow-sm transition-all" />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold">Email Address</Label>
-              <Input 
-                id="email"
-                type="email" 
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required 
-                className="h-12 bg-background border-input focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm font-semibold text-[#0F172A] dark:text-foreground">Email Address</Label>
+              <Input id="email" type="email" placeholder="name@example.com" value={email}
+                onChange={(e) => setEmail(e.target.value)} required autoComplete="email"
+                className="h-12 rounded-xl border-[#E5E7EB] bg-white dark:bg-[#1E293B] text-sm shadow-sm transition-all" />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold">Password</Label>
-              <Input 
-                id="password"
-                type="password" 
-                placeholder="Create a strong password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required 
-                className="h-12 bg-background border-input focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm font-semibold text-[#0F172A] dark:text-foreground">Password</Label>
+              <div className="relative">
+                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Create a strong password"
+                  value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password"
+                  className="h-12 rounded-xl border-[#E5E7EB] bg-white dark:bg-[#1E293B] text-sm shadow-sm pr-12 transition-all" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] transition-colors p-1"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-sm font-semibold">Account Type</Label>
-              <select 
-                id="role"
-                className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="USER">User</option>
-                <option value="MEMBER">Member</option>
-                <option value="ADMIN">Admin</option>
+            <div className="space-y-1.5">
+              <Label htmlFor="role" className="text-sm font-semibold text-[#0F172A] dark:text-foreground">Account Type</Label>
+              <select id="role" value={role} onChange={(e) => setRole(e.target.value)}
+                className="flex h-12 w-full rounded-xl border border-[#E5E7EB] bg-white dark:bg-[#1E293B] px-3 py-2 text-sm text-[#0F172A] dark:text-foreground shadow-sm transition-all focus:outline-none focus:ring-2"
+                style={{ '--tw-ring-color': 'rgba(79,70,229,0.2)' }}>
+                <option value="USER">User – Standard access</option>
+                <option value="MEMBER">Member – Extended access</option>
+                <option value="ADMIN">Admin – Full access</option>
               </select>
             </div>
-            
-            <Button type="submit" className="w-full h-12 text-base font-semibold shadow-md hover:shadow-lg transition-all rounded-xl mt-4" disabled={isLoading || success}>
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </Button>
+            <button type="submit" disabled={isLoading || success}
+              className="shine-on-hover w-full h-12 rounded-xl text-sm font-semibold text-white transition-all duration-200 btn-glow disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              style={{ background: (isLoading || success) ? '#64748B' : GRAD }}>
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating account…
+                </span>
+              ) : 'Create account →'}
+            </button>
           </form>
-          
-          <div className="text-center text-sm text-muted-foreground pb-8 lg:pb-0">
+
+          <p className="text-center text-sm text-[#64748B] mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-primary hover:text-primary/80 transition-colors">
-              Sign in
-            </Link>
-          </div>
+            <Link to="/login" className="font-semibold transition-colors" style={{ color: INDIGO }}>Sign in</Link>
+          </p>
         </div>
       </div>
     </div>
   );
 }
+
+

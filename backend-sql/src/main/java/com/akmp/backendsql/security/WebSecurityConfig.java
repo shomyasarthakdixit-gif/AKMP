@@ -46,7 +46,6 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // REMINDER: Change back to BCryptPasswordEncoder for Phase 2
         return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
     }
 

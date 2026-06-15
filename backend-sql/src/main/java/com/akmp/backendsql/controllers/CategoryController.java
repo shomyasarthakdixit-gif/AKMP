@@ -17,6 +17,9 @@ public class CategoryController {
     @Autowired
     CategoryRepository categoryRepository;
 
+    @Autowired
+    private com.akmp.backendsql.services.MongoSyncService mongoSyncService;
+
     @GetMapping
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
@@ -25,7 +28,9 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('MEMBER') or hasRole('USER')")
     public Category createCategory(@RequestBody Category category) {
-        return categoryRepository.save(category);
+        Category saved = categoryRepository.save(category);
+        mongoSyncService.syncCategory(saved);
+        return saved;
     }
 
     @PutMapping("/{id}")
@@ -34,7 +39,9 @@ public class CategoryController {
         return categoryRepository.findById(id).map(category -> {
             category.setName(categoryDetails.getName());
             category.setDescription(categoryDetails.getDescription());
-            return ResponseEntity.ok(categoryRepository.save(category));
+            Category updated = categoryRepository.save(category);
+            mongoSyncService.syncCategory(updated);
+            return ResponseEntity.ok(updated);
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -43,6 +50,7 @@ public class CategoryController {
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         return categoryRepository.findById(id).map(category -> {
             categoryRepository.delete(category);
+            mongoSyncService.deleteCategory(id);
             return ResponseEntity.ok().build();
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }

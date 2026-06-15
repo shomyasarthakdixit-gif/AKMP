@@ -38,6 +38,9 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    com.akmp.backendsql.repository.AuthorRepository authorRepository;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -55,6 +58,9 @@ public class AuthController {
                 userDetails.getEmail(),
                 userDetails.getAuthorities().iterator().next().getAuthority()));
     }
+
+    @Autowired
+    private com.akmp.backendsql.services.MongoSyncService mongoSyncService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -74,7 +80,7 @@ public class AuthController {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
-        // REMINDER: Change back to encoder.encode(signUpRequest.getPassword()) for Phase 2
+        // Plaintext password for Phase 2
         user.setPassword(signUpRequest.getPassword());
         
         // Parse role from request
@@ -93,7 +99,8 @@ public class AuthController {
             user.setRole(Role.ROLE_USER);
         }
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        mongoSyncService.syncUser(savedUser);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
@@ -103,7 +110,9 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         return userRepository.findById(id).map(user -> {
+            authorRepository.findByUserId(user.getId()).ifPresent(author -> authorRepository.delete(author));
             userRepository.delete(user);
+            mongoSyncService.deleteUser(id);
             return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -115,9 +124,10 @@ public class AuthController {
         return userRepository.findById(id).map(user -> {
             user.setUsername(updateRequest.getUsername());
             user.setEmail(updateRequest.getEmail());
-            // REMINDER: Change back to encoder.encode(updateRequest.getPassword()) for Phase 2
+            // Plaintext password for Phase 2
             user.setPassword(updateRequest.getPassword());
-            userRepository.save(user);
+            User updatedUser = userRepository.save(user);
+            mongoSyncService.syncUser(updatedUser);
             return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
