@@ -2,6 +2,7 @@ services:
   # 1. Spring Boot API (Core SQL Backend)
   - type: web
     name: akmp-backend-sql
+    plan: free
     env: docker
     rootDir: backend-sql
     branch: main
@@ -12,6 +13,7 @@ services:
   # 2. Node.js API (MongoDB Reviews Backend)
   - type: web
     name: akmp-backend-nosql
+    plan: free
     env: docker
     rootDir: backend-nosql
     branch: main
@@ -22,6 +24,7 @@ services:
   # 3. FastAPI API Gateway
   - type: web
     name: akmp-api-gateway
+    plan: free
     env: docker
     rootDir: api-gateway
     branch: main
@@ -42,6 +45,7 @@ services:
   # 4. React Frontend
   - type: web
     name: akmp-frontend
+    plan: free
     env: static
     rootDir: frontend
     branch: main
@@ -53,5 +57,3 @@ services:
           type: web
           name: akmp-api-gateway
           envVarKey: RENDER_EXTERNAL_URL
-
-
