@@ -28,26 +28,35 @@ def read_root():
 async def forward_request(request: Request, path: str, target_url: str):
     url = f"{target_url}/{path}"
     
-    # Extract query params
     params = dict(request.query_params)
     
-    # Extract headers (filtering out some hop-by-hop headers if necessary)
     headers = dict(request.headers)
     headers.pop("host", None)
+    headers.pop("content-length", None)
+    
+    # Increase timeout for Render cold starts
+    timeout = httpx.Timeout(60.0)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            # Handle request body for methods that support it
             body = await request.body()
-            response = await client.request(
-                method=request.method,
-                url=url,
-                headers=headers,
-                params=params,
-                content=body
-            )
+            if request.method in ["GET", "HEAD", "OPTIONS"]:
+                response = await client.request(
+                    method=request.method,
+                    url=url,
+                    headers=headers,
+                    params=params
+                )
+            else:
+                response = await client.request(
+                    method=request.method,
+                    url=url,
+                    headers=headers,
+                    params=params,
+                    content=body
+                )
             return Response(content=response.content, status_code=response.status_code, headers=dict(response.headers))
-        except httpx.RequestError as exc:
+        except Exception as exc:
             raise HTTPException(status_code=503, detail=f"Service unavailable: {str(exc)}")
 
 @app.api_route("/api/v1/auth/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
@@ -67,4 +76,5 @@ async def proxy_nosql(request: Request, path: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8002)
+
 
