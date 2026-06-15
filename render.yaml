@@ -57,3 +57,4 @@ services:
           type: web
           name: akmp-api-gateway
           envVarKey: RENDER_EXTERNAL_URL
+
