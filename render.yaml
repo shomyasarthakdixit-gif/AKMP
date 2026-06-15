@@ -1,0 +1,56 @@
+services:
+  # 1. Spring Boot API (Core SQL Backend)
+  - type: web
+    name: akmp-backend-sql
+    env: docker
+    rootDir: backend-sql
+    branch: main
+    envVars:
+      - key: PORT
+        value: 8080
+
+  # 2. Node.js API (MongoDB Reviews Backend)
+  - type: web
+    name: akmp-backend-nosql
+    env: docker
+    rootDir: backend-nosql
+    branch: main
+    envVars:
+      - key: PORT
+        value: 8001
+
+  # 3. FastAPI API Gateway
+  - type: web
+    name: akmp-api-gateway
+    env: docker
+    rootDir: api-gateway
+    branch: main
+    envVars:
+      - key: PORT
+        value: 8002
+      - key: SPRING_BOOT_URL
+        fromService:
+          type: web
+          name: akmp-backend-sql
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: NODE_JS_URL
+        fromService:
+          type: web
+          name: akmp-backend-nosql
+          envVarKey: RENDER_EXTERNAL_URL
+
+  # 4. React Frontend
+  - type: web
+    name: akmp-frontend
+    env: static
+    rootDir: frontend
+    branch: main
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: akmp-api-gateway
+          envVarKey: RENDER_EXTERNAL_URL
+

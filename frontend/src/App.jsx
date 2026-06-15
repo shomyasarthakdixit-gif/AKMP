@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import LandingPage from './components/LandingPage';
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -21,20 +22,15 @@ function App() {
   };
 
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </Router>
-      
-      {/* We will move the theme toggle to the TopNavbar later, but keeping it here as a fallback if not logged in. */}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/"          element={<LandingPage />} />
+        <Route path="/login"     element={<Login />} />
+        <Route path="/signup"    element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
-

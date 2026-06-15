@@ -14,7 +14,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SPRING_BOOT_URL = "http://localhost:8080/api"
+import os
+
+SPRING_BOOT_URL = os.getenv("SPRING_BOOT_URL", "http://localhost:8080/api").rstrip("/")
+if not SPRING_BOOT_URL.endswith("/api"): SPRING_BOOT_URL += "/api"
+NODE_JS_URL = os.getenv("NODE_JS_URL", "http://localhost:8001/api").rstrip("/")
+if not NODE_JS_URL.endswith("/api"): NODE_JS_URL += "/api"
 
 @app.get("/")
 def read_root():
@@ -55,8 +60,6 @@ async def proxy_sql(request: Request, path: str):
     # Route to Spring Boot standard controllers
     return await forward_request(request, path, SPRING_BOOT_URL)
 
-NODE_JS_URL = "http://localhost:8001/api"
-
 @app.api_route("/api/v1/nosql/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy_nosql(request: Request, path: str):
     # Route to Node.js / MongoDB backend
@@ -64,3 +67,4 @@ async def proxy_nosql(request: Request, path: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8002)
+

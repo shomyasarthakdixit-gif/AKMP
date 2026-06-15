@@ -46,7 +46,7 @@ export default function ReviewsModal({ isOpen, onClose, courseId, courseTitle })
   const fetchReviews = async () => {
     setIsLoadingReviews(true);
     try {
-      const res = await axios.get(`http://localhost:8002/api/v1/nosql/reviews/${courseId}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/nosql/reviews/${courseId}`, { headers: { Authorization: `Bearer ${token}` } });
       setReviews(res.data);
     } catch (err) { console.error('Failed to fetch reviews:', err); }
     finally { setIsLoadingReviews(false); }
@@ -55,7 +55,7 @@ export default function ReviewsModal({ isOpen, onClose, courseId, courseTitle })
   const handleSubmit = async (e) => {
     e.preventDefault(); setError(''); setIsSubmitting(true);
     try {
-      await axios.post('http://localhost:8002/api/v1/nosql/reviews', { courseId, userId, username, rating: newReview.rating, comment: newReview.comment }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/nosql/reviews`, { courseId, userId, username, rating: newReview.rating, comment: newReview.comment }, { headers: { Authorization: `Bearer ${token}` } });
       setNewReview({ rating: 5, comment: '' }); fetchReviews();
     } catch (err) { setError(err.response?.data?.error || 'Failed to submit review. Please try again.'); }
     finally { setIsSubmitting(false); }
@@ -64,7 +64,7 @@ export default function ReviewsModal({ isOpen, onClose, courseId, courseTitle })
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this review?')) return;
     try {
-      await axios.delete(`http://localhost:8002/api/v1/nosql/reviews/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/v1/nosql/reviews/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchReviews();
     } catch (err) { console.error('Failed to delete review:', err); }
   };
@@ -160,7 +160,7 @@ export default function ReviewsModal({ isOpen, onClose, courseId, courseTitle })
             </div>
             <textarea
               className="w-full min-h-[72px] rounded-xl border border-[#E5E7EB] dark:border-[#334155] bg-white dark:bg-[#1E293B] px-3 py-2 text-sm text-[#111827] dark:text-foreground placeholder:text-[#6B7280] dark:text-[#94A3B8] focus:outline-none focus:ring-2 focus:border-indigo-500 resize-none transition-all"
-              placeholder="Share your experience with this course…"
+              placeholder="Share your experience with this course�"
               value={newReview.comment} onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
               required aria-label="Review comment" />
             <button type="submit" disabled={isSubmitting}
@@ -174,5 +174,6 @@ export default function ReviewsModal({ isOpen, onClose, courseId, courseTitle })
     </Dialog>
   );
 }
+
 
 
