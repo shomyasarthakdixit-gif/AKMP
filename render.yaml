@@ -7,7 +7,7 @@ services:
     branch: main
     envVars:
       - key: PORT
-        value: 8080
+        value: "8080"
 
   # 2. Node.js API (MongoDB Reviews Backend)
   - type: web
@@ -17,7 +17,7 @@ services:
     branch: main
     envVars:
       - key: PORT
-        value: 8001
+        value: "8001"
 
   # 3. FastAPI API Gateway
   - type: web
@@ -27,7 +27,7 @@ services:
     branch: main
     envVars:
       - key: PORT
-        value: 8002
+        value: "8002"
       - key: SPRING_BOOT_URL
         fromService:
           type: web
@@ -46,11 +46,12 @@ services:
     rootDir: frontend
     branch: main
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: ./dist
     envVars:
       - key: VITE_API_BASE_URL
         fromService:
           type: web
           name: akmp-api-gateway
           envVarKey: RENDER_EXTERNAL_URL
+
 
